@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+ext {
+    javaVersion = '1.8'
+    flinkVersion = '1.9.0'
+    scalaBinaryVersion = '2.11'
+    slf4jVersion = '1.7.36'
+    log4jVersion = '2.17.1'
+}
+
+// artifact properties
+group = 'org.myorg.quickstart'
+version = '0.1-SNAPSHOT'
+mainClassName = 'org.myorg.quickstart.WikipediaAnalysis'
+description = """Flink Quickstart Job"""
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.properties"]
+
+// declare where to find the dependencies of your project
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repository.apache.org/content/repositories/snapshots"
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+}
+
+// declare the dependencies for your production and test code
+dependencies {
+    // --------------------------------------------------------------
+    // Compile-time dependencies that should NOT be part of the
+    // shadow jar and are provided in the lib folder of Flink
+    // --------------------------------------------------------------
+    implementation "org.apache.flink:flink-streaming-java_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-clients_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-java:${flinkVersion}"
+    implementation "org.apache.flink:flink-connector-wikiedits_${scalaBinaryVersion}:${flinkVersion}"
+
+    runtimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+    runtimeOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    runtimeOnly "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+
+    // Add test dependencies here.
+    // testCompile "junit:junit:4.12"
+}
+
+run.classpath = sourceSets.main.runtimeClasspath
+
+jar {
+    manifest {
+        attributes 'Built-By': System.getProperty('user.name'),
+                'Build-Jdk': System.getProperty('java.version')
+    }
+}
